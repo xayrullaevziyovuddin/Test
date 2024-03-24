@@ -42,14 +42,14 @@ students **load_txt_data(char *file_name, int *size)
     int fd = open(file_name, O_RDONLY);
     int count = 0;
     char *full_line;
-    students **students_array = NULL; // Инициализация массива
+    students **students_array = 0; 
 
     while (1)
     {
         full_line = read_line(fd);
-        if (full_line == NULL)
+        if (full_line == 0)
         {
-            // Ошибка чтения строки
+          
             break;
         }
         if (strlen(full_line) == 0)
@@ -59,7 +59,7 @@ students **load_txt_data(char *file_name, int *size)
         }
         students *students1 = load_to_struct(full_line);
         students_array = realloc(students_array, (count + 1) * sizeof(students *));
-        if (students_array == NULL)
+        if (students_array == 0)
         {
             // Обработка ошибки realloc
             free(students1->name);
@@ -89,6 +89,12 @@ void bubble_sort(students **arr, int size)
     {
         for (int j = 0; j < size - i - 1; j++)
         {
+        
+            if (strcmp(arr[j]->name, "Name") == 0 || strcmp(arr[j + 1]->name, "Name") == 0)
+            {
+                continue;
+            }
+        
             if (strcmp(arr[j]->name, arr[j + 1]->name) > 0)
             {
                 swap(arr, j, j + 1);
@@ -103,13 +109,27 @@ int main()
     int array_size;
     students **students_array = load_txt_data(file_name, &array_size);
 
-    if (students_array != NULL)
+    if (students_array != 0)
     {
         bubble_sort(students_array, array_size);
 
+
+        int fd = open(file_name, O_WRONLY | O_TRUNC);
+  
+
         for (int i = 0; i < array_size; i++)
         {
-            printf("Name: %s\n", students_array[i]->name);
+       
+            write(fd, students_array[i]->name, strlen(students_array[i]->name));
+            write(fd, "\n", 1);
+        }
+
+      
+        close(fd);
+
+     
+        for (int i = 0; i < array_size; i++)
+        {
             free(students_array[i]->name);
             free(students_array[i]);
         }
